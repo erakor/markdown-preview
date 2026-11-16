@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  renderer:
+    name: Renderer (build + Playwright WebKit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: renderer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: renderer/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Committed bundle must be up to date
+        working-directory: .
+        run: |
+          git status --porcelain -- App/Resources/Renderer
+          test -z "$(git status --porcelain -- App/Resources/Renderer)" || { echo "::error::App/Resources/Renderer is stale. Run 'cd renderer && npm run build' and commit."; exit 1; }
+      - run: npx playwright install --with-deps webkit
+      - run: npx playwright test --project=webkit --trace off
+
+  macos:
+    name: macOS app (xcodegen + build + test)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: Build and test
+        run: |
+          set -o pipefail
+          xcodebuild -scheme MarkdownPreview -destination 'platform=macOS' \
+            -derivedDataPath build CODE_SIGN_IDENTITY="-" build test | tee xcodebuild.log | tail -n 80
+      - name: Release build for download
+        run: |
+          xcodebuild -scheme MarkdownPreview -configuration Release -destination 'platform=macOS' \
+            -derivedDataPath build CODE_SIGN_IDENTITY="-" build
+          ditto -c -k --keepParent build/Build/Products/Release/MarkdownPreview.app MarkdownPreview.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MarkdownPreview-app
+          path: MarkdownPreview.zip
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: xcodebuild-log
+          path: xcodebuild.log

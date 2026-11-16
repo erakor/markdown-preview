@@ -1,0 +1,83 @@
+name: MarkdownPreview
+options:
+  bundleIdPrefix: dev.local
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  MarkdownPreview:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - "Resources/Renderer/**"
+      # The built renderer bundle is copied as a folder so it keeps its layout
+      # (Bundle.main/Renderer/preview.html). Rebuild with `cd renderer && npm run build`.
+      - path: App/Resources/Renderer
+        type: folder
+        buildPhase: resources
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Markdown Preview
+        LSMinimumSystemVersion: "14.0"
+        NSHumanReadableCopyright: MIT License
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Markdown Document
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Default
+            LSItemContentTypes:
+              - net.daringfireball.markdown
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: net.daringfireball.markdown
+            UTTypeDescription: Markdown Document
+            UTTypeConformsTo:
+              - public.plain-text
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - md
+                - markdown
+                - mdown
+                - mkd
+              public.mime-type:
+                - text/markdown
+    settings:
+      base:
+        # Change this to your own reverse-DNS id if you like.
+        PRODUCT_BUNDLE_IDENTIFIER: dev.local.MarkdownPreview
+        PRODUCT_NAME: MarkdownPreview
+        # Personal distribution: ad-hoc signed, no sandbox, no hardened runtime, no notarization.
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ENABLE_HARDENED_RUNTIME: NO
+        ENABLE_APP_SANDBOX: NO
+        GENERATE_INFOPLIST_FILE: NO
+  MarkdownPreviewTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: MarkdownPreview
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: dev.local.MarkdownPreviewTests
+        CODE_SIGN_IDENTITY: "-"
+schemes:
+  MarkdownPreview:
+    build:
+      targets:
+        MarkdownPreview: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MarkdownPreviewTests

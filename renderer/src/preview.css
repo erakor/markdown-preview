@@ -1,0 +1,2 @@
+/* Overridden at build time: build.mjs inlines the two vendored github-markdown
+   stylesheets here, each wrapped in a prefers-color-scheme media query. */
