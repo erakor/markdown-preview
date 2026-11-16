@@ -59,10 +59,12 @@ final class ScratchpadStore: ObservableObject {
 
     private func scheduleSave() {
         saveTask?.cancel()
-        saveTask = Task { [weak self] in
+        // Strong capture on purpose: if the window closes inside the debounce, the
+        // store must stay alive long enough to write the last edit.
+        saveTask = Task {
             try? await Task.sleep(for: .milliseconds(500))
             guard !Task.isCancelled else { return }
-            self?.saveNow()
+            self.saveNow()
         }
     }
 }

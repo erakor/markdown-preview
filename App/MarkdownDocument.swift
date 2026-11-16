@@ -8,7 +8,7 @@ extension UTType {
 
 struct MarkdownDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.markdown, .plainText] }
-    static var writableContentTypes: [UTType] { [.markdown] }
+    static var writableContentTypes: [UTType] { [.markdown, .plainText] }
 
     var text: String
 

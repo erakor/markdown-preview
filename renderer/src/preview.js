@@ -54,7 +54,14 @@ const svgCache = new Map();
 
 const getMermaidTheme = () => (darkQuery.matches ? 'dark' : 'default');
 
+const applySvg = (element, { svg, bindFunctions }, theme) => {
+    element.innerHTML = svg;
+    element.dataset.mermaidTheme = theme;
+    bindFunctions?.(element);
+};
+
 const showMermaidError = (element, error) => {
+    delete element.dataset.mermaidTheme;
     const message = error && error.message ? error.message : 'Unable to render Mermaid chart.';
     element.classList.add('mermaid-error');
     element.textContent = `Mermaid render error: ${message}`;
@@ -81,8 +88,9 @@ const renderMermaidPass = async () => {
         const key = `${theme}\u0000${source}`;
         const cached = svgCache.get(key);
         if (cached) {
-            element.innerHTML = cached.svg;
-            cached.bindFunctions?.(element);
+            if (element.dataset.mermaidTheme !== theme) {
+                applySvg(element, cached, theme);
+            }
             continue;
         }
 
@@ -92,12 +100,12 @@ const renderMermaidPass = async () => {
             if (version !== mermaidRenderVersion) {
                 return;
             }
-            svgCache.set(key, { svg, bindFunctions });
+            const entry = { svg, bindFunctions };
+            svgCache.set(key, entry);
             if (svgCache.size > SVG_CACHE_LIMIT) {
                 svgCache.delete(svgCache.keys().next().value);
             }
-            element.innerHTML = svg;
-            bindFunctions?.(element);
+            applySvg(element, entry, theme);
         } catch (error) {
             showMermaidError(element, error);
         }
@@ -123,9 +131,24 @@ darkQuery.addEventListener('change', startMermaid);
 
 // ----- public API -----
 
+// Replacing innerHTML turns every diagram back into its source text. Put cached
+// SVGs back immediately so typing does not flash raw source until the timer fires.
+const restoreCachedDiagrams = () => {
+    const theme = getMermaidTheme();
+    for (const element of output.querySelectorAll('.mermaid')) {
+        const source = element.textContent;
+        const cached = svgCache.get(`${theme}\u0000${source}`);
+        if (cached) {
+            element.dataset.mermaidSource = source;
+            applySvg(element, cached, theme);
+        }
+    }
+};
+
 const renderMarkdown = (markdown) => {
     const html = marked.parse(markdown);
     output.innerHTML = DOMPurify.sanitize(html);
+    restoreCachedDiagrams();
     scheduleMermaidRender();
 };
 
@@ -166,6 +189,10 @@ output.addEventListener('click', (event) => {
         id = decodeURIComponent(raw);
     } catch {
         // keep the raw fragment
+    }
+    if (!id) {
+        window.scrollTo(0, 0);
+        return;
     }
     (document.getElementById(id) || document.getElementsByName(id)[0])?.scrollIntoView();
 });

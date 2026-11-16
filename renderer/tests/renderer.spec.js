@@ -135,3 +135,23 @@ test('unchanged mermaid diagrams are redrawn from cache after an edit', async ({
     await page.evaluate(() => window.whenIdle());
     expect(await page.locator('#output .mermaid svg').count()).toBe(1);
 });
+
+test('cached diagrams are back in the DOM synchronously after an edit', async ({ page }) => {
+    await render(page, SIMPLE_MERMAID);
+    await page.evaluate(() => window.whenIdle());
+    const hasSvg = await page.evaluate((m) => {
+        window.renderMarkdown(`${m}\n\nmore text`);
+        return !!document.querySelector('#output .mermaid svg'); // no waiting for the 150 ms timer
+    }, SIMPLE_MERMAID);
+    expect(hasSvg).toBe(true);
+});
+
+test('a bare # link scrolls to the top', async ({ page }) => {
+    await page.setViewportSize({ width: 600, height: 300 });
+    const filler = Array.from({ length: 60 }, (_, i) => `line ${i}\n`).join('\n');
+    await render(page, `[top](#)\n\n${filler}`);
+    await page.evaluate(() => window.scrollTo(0, 500));
+    await page.locator('#output a', { hasText: 'top' }).scrollIntoViewIfNeeded();
+    await page.evaluate(() => document.querySelector('#output a').click());
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});

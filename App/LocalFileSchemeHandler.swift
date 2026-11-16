@@ -45,7 +45,10 @@ final class LocalFileSchemeHandler: NSObject, WKURLSchemeHandler {
 
         let rootURL = root.standardizedFileURL
         let candidate = segments.reduce(rootURL) { $0.appendingPathComponent($1) }.standardizedFileURL
-        guard candidate.path.hasPrefix(rootURL.path.hasSuffix("/") ? rootURL.path : rootURL.path + "/") else {
+        // Containment is judged on symlink-resolved paths, so a link inside the root cannot lead outside it.
+        let resolvedRoot = rootURL.resolvingSymlinksInPath().path
+        let rootPrefix = resolvedRoot.hasSuffix("/") ? resolvedRoot : resolvedRoot + "/"
+        guard candidate.resolvingSymlinksInPath().path.hasPrefix(rootPrefix) else {
             return nil
         }
         return candidate

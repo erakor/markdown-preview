@@ -48,6 +48,7 @@ struct ContentView: View {
         }
         .onChange(of: documentURL, initial: true) { _, url in
             preview.documentDirectory = url?.deletingLastPathComponent()
+            preview.render(text) // retry relative images that failed before the file had a folder
         }
     }
 

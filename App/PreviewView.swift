@@ -28,11 +28,18 @@ final class PreviewController: ObservableObject {
         switch message {
         case .ready:
             isReady = true
+            webView?.alphaValue = 1 // shown only once the page can paint its own background
             Task {
                 await run(PreviewBridge.baseScript, ["href": PreviewBridge.documentBaseURL])
                 await pushMarkdown()
             }
         }
+    }
+
+    /// The web content process died; hide the blank view until the reloaded page reports `ready` again.
+    func pageDidTerminate() {
+        isReady = false
+        webView?.alphaValue = 0
     }
 
     /// Debounced ~50 ms. Calls made before the page is ready are replayed on `ready`.
@@ -90,8 +97,8 @@ struct PreviewView: NSViewRepresentable {
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
-        // Public API (macOS 12+) for what shows before the page paints, instead of private KVC.
-        webView.underPageBackgroundColor = .windowBackgroundColor
+        // Invisible until the page reports `ready`, so there is no white flash before it paints (see PreviewController.handle).
+        webView.alphaValue = 0
 
         controller.attach(webView: webView, schemeHandler: handler)
         webView.load(URLRequest(url: PreviewBridge.pageURL))
@@ -116,6 +123,11 @@ struct PreviewView: NSViewRepresentable {
             Task { @MainActor in controller.handle(parsed) }
         }
 
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            Task { @MainActor in controller.pageDidTerminate() }
+            webView.load(URLRequest(url: PreviewBridge.pageURL))
+        }
+
         func webView(
             _ webView: WKWebView,
             decidePolicyFor navigationAction: WKNavigationAction,
@@ -137,14 +149,14 @@ struct PreviewView: NSViewRepresentable {
                 NSWorkspace.shared.open(external)
                 decisionHandler(.cancel)
             case .openFile:
-                // A link to a sibling file (e.g. other.md): hand it to the system, never navigate to it.
+                // A link to a sibling file: only reveal it in Finder. Opening it could launch an app or script from the folder.
                 Task { @MainActor in
                     let target = LocalFileSchemeHandler.resolve(
                         url: url,
                         appRoot: LocalFileSchemeHandler.bundledAppRoot(),
                         documentRoot: controller.documentDirectory)
                     if let target, FileManager.default.fileExists(atPath: target.path) {
-                        NSWorkspace.shared.open(target)
+                        NSWorkspace.shared.activateFileViewerSelecting([target])
                     }
                 }
                 decisionHandler(.cancel)

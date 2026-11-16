@@ -37,6 +37,22 @@ final class LocalFileSchemeHandlerTests: XCTestCase {
         XCTAssertNil(resolve("mdpreview://app"))
     }
 
+    func testRefusesSymlinkThatLeavesTheRoot() throws {
+        let base = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let root = base.appendingPathComponent("docs", isDirectory: true)
+        let outside = base.appendingPathComponent("outside", isDirectory: true)
+        let fm = FileManager.default
+        try fm.createDirectory(at: root, withIntermediateDirectories: true)
+        try fm.createDirectory(at: outside, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(at: base) }
+        try Data("secret".utf8).write(to: outside.appendingPathComponent("secret.txt"))
+        try Data("ok".utf8).write(to: root.appendingPathComponent("a.txt"))
+        try fm.createSymbolicLink(at: root.appendingPathComponent("link"), withDestinationURL: outside)
+
+        XCTAssertNil(resolve("mdpreview://doc/link/secret.txt", docRoot: root))
+        XCTAssertNotNil(resolve("mdpreview://doc/a.txt", docRoot: root))
+    }
+
     func testMimeTypes() {
         XCTAssertEqual(LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.html")), "text/html")
         XCTAssertEqual(LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.css")), "text/css")
