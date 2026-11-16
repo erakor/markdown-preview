@@ -4,7 +4,7 @@ import SwiftUI
 /// One autosaved buffer, the equivalent of the web app's localStorage buffer.
 @MainActor
 final class ScratchpadStore: ObservableObject {
-    static var defaultURL: URL {
+    nonisolated static var defaultURL: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return base
             .appendingPathComponent("MarkdownPreview", isDirectory: true)
