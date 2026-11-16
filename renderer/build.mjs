@@ -1,6 +1,6 @@
 // Builds the renderer into ../App/Resources/Renderer (committed; CI checks it is fresh).
 import { build } from 'esbuild';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,8 +16,6 @@ await build({
     format: 'iife',
     target: ['safari16'],
     legalComments: 'none',
-    // Mermaid lazy-loads diagram chunks; inline them so one file is enough.
-    splitting: false,
     logLevel: 'info',
 });
 
@@ -40,4 +38,4 @@ body { margin: 0; }
 
 const css = `@media (prefers-color-scheme: light) {\n${light}\n}\n@media (prefers-color-scheme: dark) {\n${dark}\n}\n${extra}`;
 await writeFile(join(out, 'preview.css'), css);
-await writeFile(join(out, 'preview.html'), await readFile(join(here, 'src/preview.html'), 'utf8'));
+await copyFile(join(here, 'src/preview.html'), join(out, 'preview.html'));

@@ -5,8 +5,8 @@ struct ContentView: View {
     /// nil for unsaved documents and the scratchpad.
     let documentURL: URL?
 
-    @AppStorage(SettingsKey.syncScroll) private var syncScroll = false
-    @AppStorage(SettingsKey.stackedLayout) private var stackedLayout = false
+    @AppStorage(SettingsKey.syncScroll) private var syncScroll = SettingsDefault.syncScroll
+    @AppStorage(SettingsKey.stackedLayout) private var stackedLayout = SettingsDefault.stackedLayout
     @AppStorage(SettingsKey.fontSize) private var fontSize = SettingsDefault.fontSize
     @StateObject private var preview = PreviewController()
 

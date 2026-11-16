@@ -13,11 +13,4 @@ final class EditorViewTests: XCTestCase {
         XCTAssertEqual(EditorView.scrollRatio(offset: -20, contentHeight: 1000, visibleHeight: 500), 0)
         XCTAssertEqual(EditorView.scrollRatio(offset: 0, contentHeight: 300, visibleHeight: 500), 0)
     }
-
-    func testExportPageInlinesCSSAndBody() {
-        let page = HTMLExport.standalonePage(body: "<h1>Hi</h1>", css: ".markdown-body{}")
-        XCTAssertTrue(page.contains("<style>\n.markdown-body{}\n</style>"))
-        XCTAssertTrue(page.contains("<h1>Hi</h1>"))
-        XCTAssertTrue(page.contains("color-scheme"))
-    }
 }

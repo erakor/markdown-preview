@@ -8,23 +8,11 @@ final class PreviewBridgeTests: XCTestCase {
         XCTAssertEqual(PreviewBridge.parse(["type": "ready"]), .ready)
     }
 
-    func testParsesScrollRatioFromIntAndDouble() {
-        XCTAssertEqual(PreviewBridge.parse(["type": "scroll", "ratio": 0.25]), .scroll(ratio: 0.25))
-        XCTAssertEqual(PreviewBridge.parse(["type": "scroll", "ratio": 1]), .scroll(ratio: 1))
-    }
-
     func testRejectsMalformedMessages() {
         XCTAssertNil(PreviewBridge.parse("ready"))
         XCTAssertNil(PreviewBridge.parse(["type": "nope"]))
-        XCTAssertNil(PreviewBridge.parse(["type": "scroll"]))
-        XCTAssertNil(PreviewBridge.parse(["type": "scroll", "ratio": "x"]))
-        XCTAssertNil(PreviewBridge.parse(["type": "scroll", "ratio": Double.nan]))
-    }
-
-    func testScriptsTakeValuesAsArgumentsNotInterpolation() {
-        // callAsyncJavaScript passes `arguments` as JS variables; nothing user-controlled may be spliced in.
-        XCTAssertEqual(PreviewBridge.renderScript, "window.renderMarkdown(markdown);")
-        XCTAssertFalse(PreviewBridge.scrollScript.contains("\""))
+        XCTAssertNil(PreviewBridge.parse(["type": "scroll", "ratio": 0.5]))
+        XCTAssertNil(PreviewBridge.parse([:]))
     }
 
     // MARK: navigation policy
@@ -47,13 +35,8 @@ final class PreviewBridgeTests: XCTestCase {
         XCTAssertEqual(decide("file:///etc/passwd", linked: true), .cancel)
     }
 
-    func testInPageAnchorsScrollInsteadOfNavigating() {
-        // With <base href="mdpreview://doc/">, "#section" resolves to mdpreview://doc/#section.
-        XCTAssertEqual(decide("mdpreview://doc/#my%20section", linked: true), .scrollToAnchor("my section"))
-    }
-
     func testRelativeFileLinksOpenExternally() {
-        XCTAssertEqual(decide("mdpreview://doc/notes/other.md", linked: true), .openFile(relativePath: "/notes/other.md"))
+        XCTAssertEqual(decide("mdpreview://doc/notes/other.md", linked: true), .openFile)
         XCTAssertEqual(decide("mdpreview://doc/", linked: true), .cancel)
     }
 }

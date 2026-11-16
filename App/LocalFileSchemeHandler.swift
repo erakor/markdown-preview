@@ -60,7 +60,7 @@ final class LocalFileSchemeHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url,
               let fileURL = Self.resolve(url: url, appRoot: appRoot, documentRoot: documentRoot),
-              let data = try? Data(contentsOf: fileURL) else {
+              let data = try? Data(contentsOf: fileURL, options: .mappedIfSafe) else {
             urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist))
             return
         }

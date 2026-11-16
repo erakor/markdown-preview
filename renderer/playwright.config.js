@@ -12,6 +12,6 @@ export default defineConfig({
     use: { baseURL: 'http://localhost:4173' },
     projects: [
         { name: 'webkit', use: { browserName: 'webkit' } },
-        { name: 'chromium', use: { browserName: 'chromium', launchOptions: { executablePath: process.env.CHROMIUM_PATH || undefined } } },
+        { name: 'chromium', use: { browserName: 'chromium', launchOptions: { executablePath: process.env.CHROMIUM_PATH } } },
     ],
 });

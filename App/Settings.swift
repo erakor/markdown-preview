@@ -8,13 +8,15 @@ enum SettingsKey {
 }
 
 enum SettingsDefault {
+    static let syncScroll = false
+    static let stackedLayout = false
     static let fontSize = 14.0
     static let fontSizeRange = 9.0...32.0
 }
 
 struct SettingsView: View {
-    @AppStorage(SettingsKey.syncScroll) private var syncScroll = false
-    @AppStorage(SettingsKey.stackedLayout) private var stackedLayout = false
+    @AppStorage(SettingsKey.syncScroll) private var syncScroll = SettingsDefault.syncScroll
+    @AppStorage(SettingsKey.stackedLayout) private var stackedLayout = SettingsDefault.stackedLayout
     @AppStorage(SettingsKey.fontSize) private var fontSize = SettingsDefault.fontSize
 
     var body: some View {

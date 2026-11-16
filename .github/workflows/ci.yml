@@ -2,7 +2,13 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+# A new push supersedes the previous run on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   renderer:
@@ -23,8 +29,8 @@ jobs:
       - name: Committed bundle must be up to date
         working-directory: .
         run: |
-          git status --porcelain -- App/Resources/Renderer
-          test -z "$(git status --porcelain -- App/Resources/Renderer)" || { echo "::error::App/Resources/Renderer is stale. Run 'cd renderer && npm run build' and commit."; exit 1; }
+          stale=$(git status --porcelain -- App/Resources/Renderer)
+          [ -z "$stale" ] || { echo "$stale"; echo "::error::App/Resources/Renderer is stale. Run 'cd renderer && npm run build' and commit."; exit 1; }
       - run: npx playwright install --with-deps webkit
       - run: npx playwright test --project=webkit --trace off
 
@@ -38,13 +44,13 @@ jobs:
       - name: Build and test
         run: |
           xcodebuild -scheme MarkdownPreview -destination 'platform=macOS' \
-            -derivedDataPath build CODE_SIGN_IDENTITY="-" build test > xcodebuild.log 2>&1 \
+            -derivedDataPath build build test > xcodebuild.log 2>&1 \
             || { echo '--- errors and failures ---'; grep -nE 'error:|failed|FAILED|Assertion' xcodebuild.log | head -n 80; exit 1; }
         shell: bash
       - name: Release build for download
         run: |
           xcodebuild -scheme MarkdownPreview -configuration Release -destination 'platform=macOS' \
-            -derivedDataPath build CODE_SIGN_IDENTITY="-" build
+            -derivedDataPath build build
           ditto -c -k --keepParent build/Build/Products/Release/MarkdownPreview.app MarkdownPreview.zip
       - uses: actions/upload-artifact@v4
         with:

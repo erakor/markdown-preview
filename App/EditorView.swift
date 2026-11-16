@@ -43,7 +43,6 @@ struct EditorView: NSViewRepresentable {
             name: NSView.boundsDidChangeNotification,
             object: scrollView.contentView
         )
-        context.coordinator.scrollView = scrollView
         return scrollView
     }
 
@@ -63,9 +62,8 @@ struct EditorView: NSViewRepresentable {
             context.coordinator.isUpdatingFromBinding = false
         }
 
-        let font = Self.font(size: fontSize)
-        if textView.font?.pointSize != font.pointSize {
-            textView.font = font
+        if textView.font?.pointSize != CGFloat(fontSize) {
+            textView.font = Self.font(size: fontSize)
         }
     }
 
@@ -86,7 +84,7 @@ struct EditorView: NSViewRepresentable {
 
     final class Coordinator: NSObject, NSTextViewDelegate {
         var parent: EditorView
-        weak var scrollView: NSScrollView?
+        private var lastRatio = -1.0
         var isUpdatingFromBinding = false
 
         init(_ parent: EditorView) {
@@ -99,11 +97,14 @@ struct EditorView: NSViewRepresentable {
         }
 
         @objc func scrolled(_ notification: Notification) {
-            guard let scrollView, let documentView = scrollView.documentView else { return }
+            // The notification fires for resizes and layout too; only forward real movement.
+            guard let clip = notification.object as? NSClipView, let documentView = clip.documentView else { return }
             let ratio = EditorView.scrollRatio(
-                offset: scrollView.contentView.bounds.origin.y,
+                offset: clip.bounds.origin.y,
                 contentHeight: documentView.frame.height,
-                visibleHeight: scrollView.contentView.bounds.height)
+                visibleHeight: clip.bounds.height)
+            guard abs(ratio - lastRatio) > 0.001 else { return }
+            lastRatio = ratio
             parent.onScroll(ratio)
         }
     }

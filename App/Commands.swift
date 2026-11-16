@@ -32,8 +32,8 @@ enum Clipboard {
 struct AppCommands: Commands {
     @FocusedBinding(\.documentText) private var text: String?
     @FocusedValue(\.previewController) private var preview: PreviewController?
-    @AppStorage(SettingsKey.syncScroll) private var syncScroll = false
-    @AppStorage(SettingsKey.stackedLayout) private var stackedLayout = false
+    @AppStorage(SettingsKey.syncScroll) private var syncScroll = SettingsDefault.syncScroll
+    @AppStorage(SettingsKey.stackedLayout) private var stackedLayout = SettingsDefault.stackedLayout
     @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
@@ -98,7 +98,7 @@ struct AppCommands: Commands {
 
         let page = HTMLExport.standalonePage(body: html, css: HTMLExport.bundledCSS())
         do {
-            try Data(page.utf8).write(to: url, options: .atomic)
+            try MarkdownDocument.encode(page).write(to: url, options: .atomic)
         } catch {
             NSAlert(error: error).runModal()
         }

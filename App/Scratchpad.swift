@@ -51,7 +51,7 @@ final class ScratchpadStore: ObservableObject {
         do {
             try FileManager.default.createDirectory(
                 at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try Data(text.utf8).write(to: url, options: .atomic)
+            try MarkdownDocument.encode(text).write(to: url, options: .atomic)
         } catch {
             NSLog("Scratchpad save failed: \(error)")
         }

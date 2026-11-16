@@ -32,8 +32,6 @@ final class PreviewController: ObservableObject {
                 await run(PreviewBridge.baseScript, ["href": PreviewBridge.documentBaseURL])
                 await pushMarkdown()
             }
-        case .scroll:
-            break // editor drives the preview, not the other way round
         }
     }
 
@@ -54,16 +52,10 @@ final class PreviewController: ObservableObject {
         Task { await run(PreviewBridge.scrollScript, ["ratio": ratio]) }
     }
 
-    func scrollToAnchor(_ id: String) {
-        Task { await run(PreviewBridge.anchorScript(), ["id": id]) }
-    }
-
     /// The sanitized HTML of the preview, after Mermaid has finished drawing.
     func renderedHTML() async -> String? {
-        guard isReady, let webView else { return nil }
-        let result = try? await webView.callAsyncJavaScript(
-            PreviewBridge.htmlScript, arguments: [:], in: nil, contentWorld: .page)
-        return result as? String
+        guard isReady else { return nil }
+        return await run(PreviewBridge.htmlScript, [:]) as? String
     }
 
     private func pushMarkdown() async {
@@ -94,12 +86,12 @@ struct PreviewView: NSViewRepresentable {
         let handler = LocalFileSchemeHandler(appRoot: LocalFileSchemeHandler.bundledAppRoot())
         let config = WKWebViewConfiguration()
         config.setURLSchemeHandler(handler, forURLScheme: PreviewBridge.scheme)
-        config.userContentController.add(context.coordinator, name: "bridge")
+        config.userContentController.add(context.coordinator, name: PreviewBridge.handlerName)
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
-        // Let the window's own background show until the page paints, avoiding a white flash in dark mode.
-        webView.setValue(false, forKey: "drawsBackground")
+        // Public API (macOS 12+) for what shows before the page paints, instead of private KVC.
+        webView.underPageBackgroundColor = .windowBackgroundColor
 
         controller.attach(webView: webView, schemeHandler: handler)
         webView.load(URLRequest(url: PreviewBridge.pageURL))
@@ -109,7 +101,7 @@ struct PreviewView: NSViewRepresentable {
     func updateNSView(_ nsView: WKWebView, context: Context) {}
 
     static func dismantleNSView(_ nsView: WKWebView, coordinator: Coordinator) {
-        nsView.configuration.userContentController.removeScriptMessageHandler(forName: "bridge")
+        nsView.configuration.userContentController.removeScriptMessageHandler(forName: PreviewBridge.handlerName)
     }
 
     final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
@@ -143,9 +135,6 @@ struct PreviewView: NSViewRepresentable {
                 decisionHandler(.cancel)
             case .openExternally(let external):
                 NSWorkspace.shared.open(external)
-                decisionHandler(.cancel)
-            case .scrollToAnchor(let id):
-                Task { @MainActor in controller.scrollToAnchor(id) }
                 decisionHandler(.cancel)
             case .openFile:
                 // A link to a sibling file (e.g. other.md): hand it to the system, never navigate to it.
