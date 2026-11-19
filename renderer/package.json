@@ -17,7 +17,7 @@
     "mermaid": "^12.3.0"
   },
   "devDependencies": {
-    "@erakor/toolchain": "github:erakor/toolchain#f932e1de2de8b7ab49f81be1b68339731d88b3d0",
+    "@erakor/toolchain": "github:erakor/toolchain#a43487e76663bd84ede121057887848f69e6016d",
     "@playwright/test": "^1.65.1",
     "esbuild": "^0.28.2",
     "http-server": "^14.1.1",
