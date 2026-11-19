@@ -56,7 +56,7 @@ final class PreviewController: ObservableObject {
 
     func setScrollRatio(_ ratio: Double) {
         guard isReady, ratio.isFinite else { return }
-        Task { await run(PreviewBridge.scrollScript, ["ratio": ratio]) }
+        Task { _ = await run(PreviewBridge.scrollScript, ["ratio": ratio]) }
     }
 
     /// The sanitized HTML of the preview, after Mermaid has finished drawing.

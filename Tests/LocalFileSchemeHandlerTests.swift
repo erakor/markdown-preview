@@ -1,6 +1,7 @@
 import XCTest
 @testable import MarkdownPreview
 
+@MainActor
 final class LocalFileSchemeHandlerTests: XCTestCase {
     private let appRoot = URL(fileURLWithPath: "/tmp/app/Renderer", isDirectory: true)
     private let docRoot = URL(fileURLWithPath: "/tmp/docs/notes", isDirectory: true)

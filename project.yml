@@ -6,7 +6,7 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    SWIFT_VERSION: "5.0"
+    SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
@@ -18,7 +18,7 @@ targets:
         excludes:
           - "Resources/Renderer/**"
       # The built renderer bundle is copied as a folder so it keeps its layout
-      # (Bundle.main/Renderer/preview.html). Rebuild with `cd renderer && npm run build`.
+      # (Bundle.main/Renderer/preview.html). Rebuild with `cd renderer && pnpm build`.
       - path: App/Resources/Renderer
         type: folder
         buildPhase: resources

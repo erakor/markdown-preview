@@ -3,6 +3,7 @@ import XCTest
 
 /// The other tests only exercise path logic; this one catches a packaging mistake
 /// (wrong folder reference or exclude in project.yml) that would give a blank preview.
+@MainActor
 final class BundledRendererTests: XCTestCase {
     func testRendererFilesAreInsideTheAppBundle() {
         let root = LocalFileSchemeHandler.bundledAppRoot()

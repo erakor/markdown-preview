@@ -1,6 +1,7 @@
 import XCTest
 @testable import MarkdownPreview
 
+@MainActor
 final class EditorViewTests: XCTestCase {
     func testScrollRatioMatchesWebMaths() {
         XCTAssertEqual(EditorView.scrollRatio(offset: 0, contentHeight: 1000, visibleHeight: 500), 0)

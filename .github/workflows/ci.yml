@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 # A new push supersedes the previous run on the same ref.
 concurrency:
@@ -11,6 +15,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Lint and format for renderer/, the job every erakor JS repo shares. Pinned to a toolchain
+  # commit, the same one renderer/package.json installs.
+  checks:
+    name: Renderer checks (lint + format)
+    uses: erakor/toolchain/.github/workflows/node-checks.yml@f1b5fee4e8d1d7a3df29460710db1808f5523d6f
+    with:
+      working-directory: renderer
+
   renderer:
     name: Renderer (build + Playwright WebKit)
     runs-on: ubuntu-latest
@@ -18,27 +30,40 @@ jobs:
       run:
         working-directory: renderer
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: renderer/package-lock.json
-      - run: npm ci
-      - run: npm run build
+          package_json_file: renderer/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: renderer/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - name: Committed bundle must be up to date
         working-directory: .
         run: |
           stale=$(git status --porcelain -- App/Resources/Renderer)
-          [ -z "$stale" ] || { echo "$stale"; echo "::error::App/Resources/Renderer is stale. Run 'cd renderer && npm run build' and commit."; exit 1; }
-      - run: npx playwright install --with-deps webkit
-      - run: npx playwright test --project=webkit --trace off
+          [ -z "$stale" ] || { echo "$stale"; echo "::error::App/Resources/Renderer is stale. Run 'cd renderer && pnpm build' and commit."; exit 1; }
+      - run: pnpm exec playwright install --with-deps webkit
+      - run: pnpm test:e2e --project=webkit --trace off
+
+  # Style, from .swift-format (a copy of erakor/toolchain's). Not strict yet: the code has not
+  # been through swift-format, so this reports only. Set `strict: true` once the output is empty.
+  # Pinned to a toolchain commit.
+  swift-format:
+    name: swift-format lint
+    uses: erakor/toolchain/.github/workflows/swift-checks.yml@822ecaf4610254a1e55074923f2c46f0d2b54a5b
+    with:
+      paths: App Tests
+      strict: false
 
   macos:
     name: macOS app (xcodegen + build + test)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: brew install xcodegen
       - run: xcodegen generate
       - name: Build and test
@@ -52,11 +77,11 @@ jobs:
           xcodebuild -scheme MarkdownPreview -configuration Release -destination 'platform=macOS' \
             -derivedDataPath build build
           ditto -c -k --keepParent build/Build/Products/Release/MarkdownPreview.app MarkdownPreview.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: MarkdownPreview-app
           path: MarkdownPreview.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: xcodebuild-log
