@@ -1,26 +1,26 @@
 // Builds the renderer into ../App/Resources/Renderer (committed; CI checks it is fresh).
-import { build } from 'esbuild';
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { build } from 'esbuild'
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const here = dirname(fileURLToPath(import.meta.url));
-const out = join(here, '..', 'App', 'Resources', 'Renderer');
-await mkdir(out, { recursive: true });
+const here = dirname(fileURLToPath(import.meta.url))
+const out = join(here, '..', 'App', 'Resources', 'Renderer')
+await mkdir(out, { recursive: true })
 
 await build({
-    entryPoints: [join(here, 'src/preview.js')],
-    outfile: join(out, 'preview.js'),
-    bundle: true,
-    minify: true,
-    format: 'iife',
-    target: ['safari16'],
-    legalComments: 'none',
-    logLevel: 'info',
-});
+  entryPoints: [join(here, 'src/preview.js')],
+  outfile: join(out, 'preview.js'),
+  bundle: true,
+  minify: true,
+  format: 'iife',
+  target: ['safari16'],
+  legalComments: 'none',
+  logLevel: 'info',
+})
 
-const light = await readFile(join(here, 'src/vendor/github-markdown-light.css'), 'utf8');
-const dark = await readFile(join(here, 'src/vendor/github-markdown-dark_dimmed.css'), 'utf8');
+const light = await readFile(join(here, 'src/vendor/github-markdown-light.css'), 'utf8')
+const dark = await readFile(join(here, 'src/vendor/github-markdown-dark_dimmed.css'), 'utf8')
 
 // Preflight-free on purpose (see the upstream style.css): no reset, so lists
 // and inline images keep browser defaults that github-markdown relies on.
@@ -34,8 +34,8 @@ body { margin: 0; }
 .markdown-body .mermaid svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 .markdown-body .mermaid-error { color: #cf222e; white-space: pre-wrap; text-align: left; }
 @media (prefers-color-scheme: dark) { .markdown-body .mermaid-error { color: #ff7b72; } }
-`;
+`
 
-const css = `@media (prefers-color-scheme: light) {\n${light}\n}\n@media (prefers-color-scheme: dark) {\n${dark}\n}\n${extra}`;
-await writeFile(join(out, 'preview.css'), css);
-await copyFile(join(here, 'src/preview.html'), join(out, 'preview.html'));
+const css = `@media (prefers-color-scheme: light) {\n${light}\n}\n@media (prefers-color-scheme: dark) {\n${dark}\n}\n${extra}`
+await writeFile(join(out, 'preview.css'), css)
+await copyFile(join(here, 'src/preview.html'), join(out, 'preview.html'))
