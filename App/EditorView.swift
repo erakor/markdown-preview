@@ -82,6 +82,7 @@ struct EditorView: NSViewRepresentable {
         return Double(min(1, max(0, offset / maxOffset)))
     }
 
+    @MainActor
     final class Coordinator: NSObject, NSTextViewDelegate {
         var parent: EditorView
         private var lastRatio = -1.0

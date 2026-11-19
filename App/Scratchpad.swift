@@ -19,7 +19,8 @@ final class ScratchpadStore: ObservableObject {
     }
 
     private var saveTask: Task<Void, Never>?
-    private var terminationObserver: NSObjectProtocol?
+    // Read from deinit, which is not main-actor isolated; only ever set once, in init.
+    private nonisolated(unsafe) var terminationObserver: NSObjectProtocol?
 
     /// Loads the saved buffer. A missing or empty file is seeded with the
     /// sample document, matching the web app (`if (lastContent) ... else defaultInput`).

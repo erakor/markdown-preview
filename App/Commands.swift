@@ -106,6 +106,7 @@ struct AppCommands: Commands {
 }
 
 enum HTMLExport {
+    @MainActor
     static func bundledCSS() -> String {
         let url = LocalFileSchemeHandler.bundledAppRoot().appendingPathComponent("preview.css")
         return (try? String(contentsOf: url, encoding: .utf8)) ?? ""
