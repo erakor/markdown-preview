@@ -19,7 +19,7 @@ jobs:
   # commit, the same one renderer/package.json installs.
   checks:
     name: Renderer checks (lint + format)
-    uses: erakor/toolchain/.github/workflows/node-checks.yml@f1b5fee4e8d1d7a3df29460710db1808f5523d6f
+    uses: erakor/toolchain/.github/workflows/node-checks.yml@f932e1de2de8b7ab49f81be1b68339731d88b3d0
     with:
       working-directory: renderer
 
@@ -54,7 +54,7 @@ jobs:
   # Pinned to a toolchain commit.
   swift-format:
     name: swift-format lint
-    uses: erakor/toolchain/.github/workflows/swift-checks.yml@822ecaf4610254a1e55074923f2c46f0d2b54a5b
+    uses: erakor/toolchain/.github/workflows/swift-checks.yml@f932e1de2de8b7ab49f81be1b68339731d88b3d0
     with:
       paths: App Tests
       strict: false

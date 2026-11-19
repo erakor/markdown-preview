@@ -186,8 +186,8 @@ importers:
         version: 12.3.0
     devDependencies:
       '@erakor/toolchain':
-        specifier: github:erakor/toolchain#f1b5fee4e8d1d7a3df29460710db1808f5523d6f
-        version: https://codeload.github.com/erakor/toolchain/tar.gz/f1b5fee4e8d1d7a3df29460710db1808f5523d6f(oxfmt@0.79.0)(oxlint@1.94.0)
+        specifier: github:erakor/toolchain#f932e1de2de8b7ab49f81be1b68339731d88b3d0
+        version: https://codeload.github.com/erakor/toolchain/tar.gz/f932e1de2de8b7ab49f81be1b68339731d88b3d0(oxfmt@0.79.0)(oxlint@1.94.0)
       '@playwright/test':
         specifier: ^1.65.1
         version: 1.65.1
@@ -227,9 +227,9 @@ packages:
   '@chevrotain/utils@13.2.0':
     resolution: {integrity: sha512-SzKYY68rseOrb9KILVzPsl6SjkQtdWw01SRGB5aCVI5kFcHltQsOYV3JB0Ffst72DgkvHCyDQ0NLwxtmCCf97Q==}
 
-  '@erakor/toolchain@https://codeload.github.com/erakor/toolchain/tar.gz/f1b5fee4e8d1d7a3df29460710db1808f5523d6f':
-    resolution: {gitHosted: true, integrity: sha512-PHbvjwMNLa88gBOzTF08997S/gNRofS+iUM9Np4KwCcI+xhLL7vCcdNyEG3BJHIG4OlRzScPe6S2sDhx6XyrjA==, tarball: https://codeload.github.com/erakor/toolchain/tar.gz/f1b5fee4e8d1d7a3df29460710db1808f5523d6f}
-    version: 1.0.0
+  '@erakor/toolchain@https://codeload.github.com/erakor/toolchain/tar.gz/f932e1de2de8b7ab49f81be1b68339731d88b3d0':
+    resolution: {gitHosted: true, integrity: sha512-9sas5yJlEDoQ2vgtf2SdjFwCp1VIT61+TORipCCDy3muudqrTX5nUd7/jSEPTUklmdVSCPzZh/C6Mf7R6utlJA==, tarball: https://codeload.github.com/erakor/toolchain/tar.gz/f932e1de2de8b7ab49f81be1b68339731d88b3d0}
+    version: 1.3.0
     engines: {node: '>=26'}
     peerDependencies:
       oxfmt: '>=0.79.0'
@@ -1282,7 +1282,7 @@ snapshots:
 
   '@chevrotain/utils@13.2.0': {}
 
-  '@erakor/toolchain@https://codeload.github.com/erakor/toolchain/tar.gz/f1b5fee4e8d1d7a3df29460710db1808f5523d6f(oxfmt@0.79.0)(oxlint@1.94.0)':
+  '@erakor/toolchain@https://codeload.github.com/erakor/toolchain/tar.gz/f932e1de2de8b7ab49f81be1b68339731d88b3d0(oxfmt@0.79.0)(oxlint@1.94.0)':
     dependencies:
       oxfmt: 0.79.0
       oxlint: 1.94.0

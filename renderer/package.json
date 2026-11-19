@@ -6,7 +6,7 @@
   "description": "Markdown + Mermaid renderer bundle loaded by the macOS app's WKWebView",
   "scripts": {
     "build": "node build.mjs",
-    "lint": "oxlint --report-unused-disable-directives",
+    "lint": "oxlint --report-unused-disable-directives --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "test:e2e": "playwright test"
@@ -17,7 +17,7 @@
     "mermaid": "^12.3.0"
   },
   "devDependencies": {
-    "@erakor/toolchain": "github:erakor/toolchain#f1b5fee4e8d1d7a3df29460710db1808f5523d6f",
+    "@erakor/toolchain": "github:erakor/toolchain#f932e1de2de8b7ab49f81be1b68339731d88b3d0",
     "@playwright/test": "^1.65.1",
     "esbuild": "^0.28.2",
     "http-server": "^14.1.1",
