@@ -39,7 +39,8 @@ final class LocalFileSchemeHandler: NSObject, WKURLSchemeHandler {
         // `url.path` is already percent-decoded, so %2e%2e shows up as "..".
         let segments = url.path.split(separator: "/", omittingEmptySubsequences: true).map(String.init)
         guard !segments.isEmpty,
-              !segments.contains(where: { $0 == ".." || $0 == "." || $0.contains("\0") }) else {
+            !segments.contains(where: { $0 == ".." || $0 == "." || $0.contains("\0") })
+        else {
             return nil
         }
 
@@ -62,8 +63,9 @@ final class LocalFileSchemeHandler: NSObject, WKURLSchemeHandler {
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url,
-              let fileURL = Self.resolve(url: url, appRoot: appRoot, documentRoot: documentRoot),
-              let data = try? Data(contentsOf: fileURL, options: .mappedIfSafe) else {
+            let fileURL = Self.resolve(url: url, appRoot: appRoot, documentRoot: documentRoot),
+            let data = try? Data(contentsOf: fileURL, options: .mappedIfSafe)
+        else {
             urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist))
             return
         }

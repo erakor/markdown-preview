@@ -28,7 +28,7 @@ final class PreviewController: ObservableObject {
         switch message {
         case .ready:
             isReady = true
-            webView?.alphaValue = 1 // shown only once the page can paint its own background
+            webView?.alphaValue = 1  // shown only once the page can paint its own background
             Task {
                 await run(PreviewBridge.baseScript, ["href": PreviewBridge.documentBaseURL])
                 await pushMarkdown()
@@ -118,7 +118,9 @@ struct PreviewView: NSViewRepresentable {
             self.controller = controller
         }
 
-        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        func userContentController(
+            _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
+        ) {
             guard let parsed = PreviewBridge.parse(message.body) else { return }
             Task { @MainActor in controller.handle(parsed) }
         }

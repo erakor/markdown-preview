@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import MarkdownPreview
 
 /// The other tests only exercise path logic; this one catches a packaging mistake

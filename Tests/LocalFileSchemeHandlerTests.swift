@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import MarkdownPreview
 
 @MainActor
@@ -6,7 +7,9 @@ final class LocalFileSchemeHandlerTests: XCTestCase {
     private let appRoot = URL(fileURLWithPath: "/tmp/app/Renderer", isDirectory: true)
     private let docRoot = URL(fileURLWithPath: "/tmp/docs/notes", isDirectory: true)
 
-    private func resolve(_ string: String, docRoot: URL? = URL(fileURLWithPath: "/tmp/docs/notes", isDirectory: true)) -> String? {
+    private func resolve(
+        _ string: String, docRoot: URL? = URL(fileURLWithPath: "/tmp/docs/notes", isDirectory: true)
+    ) -> String? {
         LocalFileSchemeHandler.resolve(url: URL(string: string)!, appRoot: appRoot, documentRoot: docRoot)?.path
     }
 
@@ -58,6 +61,7 @@ final class LocalFileSchemeHandlerTests: XCTestCase {
         XCTAssertEqual(LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.html")), "text/html")
         XCTAssertEqual(LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.css")), "text/css")
         XCTAssertEqual(LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.svg")), "image/svg+xml")
-        XCTAssertEqual(LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.unknownext")), "application/octet-stream")
+        XCTAssertEqual(
+            LocalFileSchemeHandler.mimeType(for: URL(fileURLWithPath: "/x/a.unknownext")), "application/octet-stream")
     }
 }

@@ -6,7 +6,8 @@ import SwiftUI
 final class ScratchpadStore: ObservableObject {
     nonisolated static var defaultURL: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return base
+        return
+            base
             .appendingPathComponent("MarkdownPreview", isDirectory: true)
             .appendingPathComponent("scratchpad.md")
     }

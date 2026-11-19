@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import MarkdownPreview
 
 @MainActor
@@ -31,7 +32,8 @@ final class ScratchpadTests: XCTestCase {
     }
 
     func testEmptyFileIsReseededLikeTheWebApp() throws {
-        try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data().write(to: fileURL)
         XCTAssertEqual(ScratchpadStore(url: fileURL, seed: "seed").text, "seed")
     }
