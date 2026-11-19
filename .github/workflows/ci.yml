@@ -49,6 +49,16 @@ jobs:
       - run: pnpm exec playwright install --with-deps webkit
       - run: pnpm test:e2e --project=webkit --trace off
 
+  # Style, from .swift-format (a copy of erakor/toolchain's). Not strict yet: the code has not
+  # been through swift-format, so this reports only. Set `strict: true` once the output is empty.
+  # Pinned to a toolchain commit.
+  swift-format:
+    name: swift-format lint
+    uses: erakor/toolchain/.github/workflows/swift-checks.yml@822ecaf4610254a1e55074923f2c46f0d2b54a5b
+    with:
+      paths: App Tests
+      strict: false
+
   macos:
     name: macOS app (xcodegen + build + test)
     runs-on: macos-15
@@ -56,9 +66,6 @@ jobs:
       - uses: actions/checkout@v7
       - run: brew install xcodegen
       - run: xcodegen generate
-      # Not --strict yet: the Swift code has not been through swift-format. Flip it once clean.
-      - name: swift-format lint
-        run: xcrun swift-format lint --recursive App Tests
       - name: Build and test
         run: |
           xcodebuild -scheme MarkdownPreview -destination 'platform=macOS' \

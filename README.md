@@ -39,4 +39,4 @@ CI rebuilds the bundle and fails if the committed copy is stale.
 
 ## CI
 
-`.github/workflows/ci.yml` has three jobs: the renderer's lint and format checks (the shared job from erakor/toolchain), the renderer's build, bundle freshness and Playwright WebKit tests (Linux), and the app (`xcodegen`, `swift-format lint`, `xcodebuild build test` on macOS 15, with the built `.app` uploaded as an artifact). It can also be started by hand (`workflow_dispatch`).
+`.github/workflows/ci.yml` has four jobs: the renderer's lint and format checks and the Swift `swift-format lint` (both shared jobs from erakor/toolchain), the renderer's build, bundle freshness and Playwright WebKit tests (Linux), and the app (`xcodegen`, `xcodebuild build test` on macOS 15, with the built `.app` uploaded as an artifact). It can also be started by hand (`workflow_dispatch`).
