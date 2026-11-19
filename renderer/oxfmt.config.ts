@@ -4,7 +4,7 @@ import base from '@erakor/toolchain/oxfmt'
 // reformatting it would change a build output rather than just style.
 const config = {
   ...base,
-  ignorePatterns: ['src/vendor/**', 'src/preview.html', 'pnpm-lock.yaml'],
+  ignorePatterns: ['src/vendor/**', 'src/preview.html'],
 }
 
 export default config
