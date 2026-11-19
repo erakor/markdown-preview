@@ -21,6 +21,7 @@ jobs:
           echo "LINT-AFTER-BEGIN"
           xcrun swift-format lint --recursive $PATHS 2>&1 | tee /tmp/after.txt | tail -400 || true
           echo "LINT-AFTER-COUNT $(wc -l < /tmp/after.txt)"
+          head -c 160000 /dev/zero | tr "\0" "x" | fold -w 200
           echo "PATCH-BEGIN"
           git diff | gzip -9 | base64 | fold -w 3000
           echo "PATCH-END"
