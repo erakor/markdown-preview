@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'App', 'Resources', 'Renderer')
 
 // WebKit is the engine behind WKWebView and is what CI runs. Containers that
-// only ship Chromium can run `npx playwright test --project=chromium`.
+// only ship Chromium can run `pnpm exec playwright test --project=chromium`.
 export default defineConfig({
   testDir: 'tests',
   webServer: {

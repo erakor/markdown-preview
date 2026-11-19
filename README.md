@@ -27,15 +27,16 @@ Change `PRODUCT_BUNDLE_IDENTIFIER` in `project.yml` if you want your own id.
 The preview page lives in `renderer/` and is built into `App/Resources/Renderer/`, which **is committed**, so building the app needs no Node. After changing anything in `renderer/src`:
 
 ```bash
-cd renderer
-npm ci
-npm run build
-npx playwright install webkit   # once
-npm test                        # Playwright on WebKit, the engine WKWebView uses
+cd renderer                     # Node 26 (.nvmrc) and pnpm: `corepack enable`
+pnpm install --frozen-lockfile
+pnpm build
+pnpm lint && pnpm format:check  # oxlint and oxfmt, settings from erakor/toolchain
+pnpm exec playwright install webkit   # once
+pnpm test:e2e                   # Playwright on WebKit, the engine WKWebView uses
 ```
 
 CI rebuilds the bundle and fails if the committed copy is stale.
 
 ## CI
 
-`.github/workflows/ci.yml` has two jobs: the renderer (build + Playwright WebKit, Linux) and the app (`xcodegen`, `xcodebuild build test` on macOS 15, with the built `.app` uploaded as an artifact).
+`.github/workflows/ci.yml` has three jobs: the renderer's lint and format checks (the shared job from erakor/toolchain), the renderer's build, bundle freshness and Playwright WebKit tests (Linux), and the app (`xcodegen`, `swift-format lint`, `xcodebuild build test` on macOS 15, with the built `.app` uploaded as an artifact). It can also be started by hand (`workflow_dispatch`).
