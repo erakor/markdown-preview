@@ -1,3 +1,6 @@
 # The reformat of renderer/ to the shared oxfmt style (2 spaces, no semicolons, single quotes).
 # GitHub skips it in blame; locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
 59f4387bff90f68fde4dab23af6d5c7c38a2d224
+
+# The one-time reformat of App and Tests with swift-format (erakor/toolchain's shared style).
+5eb1fa8fc713b4d44c73c8447c9dfa5906bf12de
