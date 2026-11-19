@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import MarkdownPreview
 
 final class PreviewBridgeTests: XCTestCase {
@@ -29,7 +30,8 @@ final class PreviewBridgeTests: XCTestCase {
     }
 
     func testExternalLinksGoToTheSystem() {
-        XCTAssertEqual(decide("https://example.com/a", linked: true), .openExternally(URL(string: "https://example.com/a")!))
+        XCTAssertEqual(
+            decide("https://example.com/a", linked: true), .openExternally(URL(string: "https://example.com/a")!))
         XCTAssertEqual(decide("mailto:a@b.c", linked: true), .openExternally(URL(string: "mailto:a@b.c")!))
         XCTAssertEqual(decide("javascript:alert(1)", linked: true), .cancel)
         XCTAssertEqual(decide("file:///etc/passwd", linked: true), .cancel)

@@ -15,9 +15,13 @@ struct ContentView: View {
         // controller replays the latest Markdown when the new page is ready.
         Group {
             if stackedLayout {
-                VSplitView { editor; previewPane }
+                VSplitView {
+                    editor; previewPane
+                }
             } else {
-                HSplitView { editor; previewPane }
+                HSplitView {
+                    editor; previewPane
+                }
             }
         }
         .frame(minWidth: 520, minHeight: 320)
@@ -48,7 +52,7 @@ struct ContentView: View {
         }
         .onChange(of: documentURL, initial: true) { _, url in
             preview.documentDirectory = url?.deletingLastPathComponent()
-            preview.render(text) // retry relative images that failed before the file had a folder
+            preview.render(text)  // retry relative images that failed before the file had a folder
         }
     }
 
